@@ -2,6 +2,7 @@ import React, { ComponentType, FunctionComponent } from 'react';
 import { RouteComponentProps } from 'react-router';
 import queryString from 'query-string';
 import { useQuery } from 'react-apollo-hooks';
+import { head } from 'lodash';
 
 import { GET_AUTH_STATE_QUERY } from '../apollo/queries/auth/get-auth-state';
 
@@ -18,10 +19,14 @@ const withAnonymousRoute = <P extends {}>(InputComponent: ComponentType<P>) => {
     const { data } = useQuery(GET_AUTH_STATE_QUERY);
 
     const redirectToUrl = () => {
-      const redirectUrl = queryString.parse(location.search)
-        .redirectUrl as string;
+      const redirectUrlQuery = queryString.parse(location.search).redirectUrl;
 
-      history.replace(redirectUrl ? redirectUrl : '/');
+      const redirectUrl =
+        redirectUrlQuery instanceof Array
+          ? head(redirectUrlQuery)
+          : redirectUrlQuery;
+
+      history.replace(redirectUrl || '/');
     };
 
     if (data.isAuthenticated) {
