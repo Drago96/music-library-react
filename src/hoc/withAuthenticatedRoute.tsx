@@ -20,10 +20,11 @@ const withAuthenticatedRoute = <P extends {}>(
 
     const isAuthenticated = data.isAuthenticated;
 
-    useEffect(
-      () => history.replace(`/login?redirectUrl=${location.pathname}`),
-      [isAuthenticated]
-    );
+    useEffect(() => {
+      if (!isAuthenticated) {
+        history.replace(`/login?redirectUrl=${location.pathname}`);
+      }
+    }, [isAuthenticated]);
 
     return isAuthenticated ? <InputComponent {...props} /> : null;
   };
