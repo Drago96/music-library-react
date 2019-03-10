@@ -22,7 +22,7 @@ const withAuthenticatedRoute = <P extends {}>(
       history.replace(`/login?redirectUrl=${location.pathname}`);
     };
 
-    if (data.isAuthenticated) {
+    if (!data.isAuthenticated) {
       redirectToLogin();
 
       return null;
