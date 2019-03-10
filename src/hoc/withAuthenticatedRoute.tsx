@@ -1,4 +1,4 @@
-import React, { ComponentType, FunctionComponent } from 'react';
+import React, { ComponentType, FunctionComponent, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useQuery } from 'react-apollo-hooks';
 
@@ -18,17 +18,14 @@ const withAuthenticatedRoute = <P extends {}>(
 
     const { data } = useQuery(GET_AUTH_STATE_QUERY);
 
-    const redirectToLogin = () => {
-      history.replace(`/login?redirectUrl=${location.pathname}`);
-    };
+    const isAuthenticated = data.isAuthenticated;
 
-    if (!data.isAuthenticated) {
-      redirectToLogin();
+    useEffect(
+      () => history.replace(`/login?redirectUrl=${location.pathname}`),
+      [isAuthenticated]
+    );
 
-      return null;
-    }
-
-    return <InputComponent {...props} />;
+    return isAuthenticated ? <InputComponent {...props} /> : null;
   };
 
   return AuthenticatedComponent;

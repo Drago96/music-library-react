@@ -1,4 +1,4 @@
-import React, { ComponentType, FunctionComponent } from 'react';
+import React, { ComponentType, FunctionComponent, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import queryString from 'query-string';
 import { useQuery } from 'react-apollo-hooks';
@@ -18,24 +18,22 @@ const withAnonymousRoute = <P extends {}>(InputComponent: ComponentType<P>) => {
 
     const { data } = useQuery(GET_AUTH_STATE_QUERY);
 
-    const redirectToUrl = () => {
-      const redirectUrlQuery = queryString.parse(location.search).redirectUrl;
+    const isAnonymous = !data.isAuthenticated;
 
-      const redirectUrl =
-        redirectUrlQuery instanceof Array
-          ? head(redirectUrlQuery)
-          : redirectUrlQuery;
+    useEffect(() => {
+      if (!isAnonymous) {
+        const redirectUrlQuery = queryString.parse(location.search).redirectUrl;
 
-      history.replace(redirectUrl || '/');
-    };
+        const redirectUrl =
+          redirectUrlQuery instanceof Array
+            ? head(redirectUrlQuery)
+            : redirectUrlQuery;
 
-    if (data.isAuthenticated) {
-      redirectToUrl();
+        history.replace(redirectUrl || '/');
+      }
+    }, [isAnonymous]);
 
-      return null;
-    }
-
-    return <InputComponent {...props} />;
+    return isAnonymous ? <InputComponent {...props} /> : null;
   };
 
   return AnonymousComponent;
