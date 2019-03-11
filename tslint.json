@@ -2,7 +2,6 @@
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "rulesDirectory": ["tslint-plugin-prettier"],
   "rules": {
-    "quotemark": [true, "single"],
     "member-access": [false],
     "ordered-imports": [false],
     "max-line-length": [true, 150],
@@ -11,6 +10,7 @@
     "arrow-parens": false,
     "object-literal-sort-keys": false,
     "trailing-comma": false,
-    "prettier": true
+    "prettier": true,
+    "jsx-no-lambda": false
   }
 }
