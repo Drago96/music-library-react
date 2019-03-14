@@ -1,10 +1,14 @@
-import React from 'react';
-import { Formik, Field, Form } from 'formik';
+import React, { FunctionComponent, useState } from 'react';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, FormControl } from '@material-ui/core';
 import * as Yup from 'yup';
 
 import { useStyles } from './LoginForm.styles';
+
+interface OwnProps {
+  onSubmit: (values: { email: string; password: string }) => Promise<any>;
+}
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -16,18 +20,27 @@ const loginSchema = Yup.object().shape({
     .max(24)
 });
 
-const LoginForm = () => {
+const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
   const classes = useStyles();
+
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
-      onSubmit={values => {
-        // console.log(values);
+      onSubmit={(values, { setSubmitting }) => {
+        onSubmit(values).catch(e => {
+          setFormErrors(e);
+
+          setSubmitting(false);
+        });
       }}
       validationSchema={loginSchema}
-      render={({ submitForm }) => (
+      render={({ submitForm, isSubmitting }) => (
         <Form>
+          {formErrors.length > 0 && (
+            <p className={classes.formError}>formErrors</p>
+          )}
           <FormControl fullWidth={true} margin={'dense'}>
             <Field
               name="email"
@@ -50,6 +63,7 @@ const LoginForm = () => {
               fullWidth={true}
               variant={'contained'}
               color={'primary'}
+              disabled={isSubmitting}
             >
               Login
             </Button>

@@ -1,5 +1,5 @@
 import React, { ComponentType, FunctionComponent, useEffect } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import { useQuery } from 'react-apollo-hooks';
 
 import { GET_AUTH_STATE_QUERY } from '../apollo/queries/auth/get-auth-state';
@@ -24,12 +24,12 @@ const withAuthenticatedRoute = <P extends {}>(
       if (!isAuthenticated) {
         history.replace(`/login?redirectUrl=${location.pathname}`);
       }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, history, location]);
 
     return isAuthenticated ? <InputComponent {...props} /> : null;
   };
 
-  return AuthenticatedComponent;
+  return withRouter(AuthenticatedComponent);
 };
 
 export default withAuthenticatedRoute;

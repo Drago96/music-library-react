@@ -1,5 +1,5 @@
 import React, { ComponentType, FunctionComponent, useEffect } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import queryString from 'query-string';
 import { useQuery } from 'react-apollo-hooks';
 import { head } from 'lodash';
@@ -31,12 +31,12 @@ const withAnonymousRoute = <P extends {}>(InputComponent: ComponentType<P>) => {
 
         history.replace(redirectUrl || '/');
       }
-    }, [isAnonymous]);
+    }, [isAnonymous, history, location]);
 
     return isAnonymous ? <InputComponent {...props} /> : null;
   };
 
-  return AnonymousComponent;
+  return withRouter(AnonymousComponent);
 };
 
 export default withAnonymousRoute;

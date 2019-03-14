@@ -1,8 +1,9 @@
 import { makeStyles } from '@material-ui/styles';
 
-export const useStyles = makeStyles({
-  field: {
+export const useStyles = makeStyles(theme => ({
+  formError: {
     display: 'block',
-    width: '100%'
+    color: theme.palette.error.main,
+    textAlign: 'center'
   }
-});
+}));
