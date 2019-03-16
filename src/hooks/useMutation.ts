@@ -6,7 +6,7 @@ import {
 } from 'react-apollo-hooks';
 import { OperationVariables } from 'apollo-boost';
 
-export const useMutation = (
+type UseMutationHook = (
   mutation: any,
   {
     onCompleted,
@@ -15,11 +15,16 @@ export const useMutation = (
   }: {
     onCompleted?: (data?: any) => void;
     onError?: (error?: any) => void;
-  } & MutationHookOptions<{}, OperationVariables, object> = {}
-): [
+  } & MutationHookOptions<{}, OperationVariables, object>
+) => [
   MutationFn<{}, OperationVariables>,
   { loading: boolean; called: boolean; error: any }
-] => {
+];
+
+export const useMutation: UseMutationHook = (
+  mutation,
+  { onCompleted, onError, ...options } = {}
+) => {
   const mutate = useHookMutation(mutation, options);
 
   const [loading, setLoading] = useState(false);

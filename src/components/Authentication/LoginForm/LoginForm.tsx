@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useState } from 'react';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
+import React, { FunctionComponent } from 'react';
+import { Formik, Field, Form } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, FormControl } from '@material-ui/core';
 import * as Yup from 'yup';
 
 import { useStyles } from './LoginForm.styles';
+import { useErrorsHandler } from '../../../hooks/useErrorsHandler';
 
 interface OwnProps {
   onSubmit: (values: { email: string; password: string }) => Promise<any>;
@@ -23,14 +24,14 @@ const loginSchema = Yup.object().shape({
 const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
   const classes = useStyles();
 
-  const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [errors, setErrors] = useErrorsHandler();
 
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
       onSubmit={(values, { setSubmitting }) => {
         onSubmit(values).catch(e => {
-          setFormErrors(e);
+          setErrors(e);
 
           setSubmitting(false);
         });
@@ -38,8 +39,14 @@ const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
       validationSchema={loginSchema}
       render={({ submitForm, isSubmitting }) => (
         <Form>
-          {formErrors.length > 0 && (
-            <p className={classes.formError}>formErrors</p>
+          {errors.length > 0 && (
+            <p>
+              {errors.map(e => (
+                <span key={e} className={classes.formError}>
+                  {e}
+                </span>
+              ))}
+            </p>
           )}
           <FormControl fullWidth={true} margin={'dense'}>
             <Field

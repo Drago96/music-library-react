@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useCallback } from 'react';
 
 import { useMutation } from '../../../hooks/useMutation';
 import { SIGN_IN_MUTATION } from '../../../apollo/mutations/auth/sign-in';
@@ -9,12 +9,15 @@ import { AUTH_TOKEN } from '../../../config/constants';
 
 const LoginForm: FunctionComponent = () => {
   const [signInMutation] = useMutation(SIGN_IN_MUTATION, {
-    onCompleted: data => localStorage.setItem(AUTH_TOKEN, data.signIn.token),
-    update: cache => cache.writeData({ data: { isAuthenticated: true } })
+    update: cache => cache.writeData({ data: { isAuthenticated: true } }),
+    onCompleted: data => localStorage.setItem(AUTH_TOKEN, data.signIn.token)
   });
 
-  const onSubmit = ({ email, password }: { email: string; password: string }) =>
-    signInMutation({ variables: { email, password } });
+  const onSubmit = useCallback(
+    ({ email, password }: { email: string; password: string }) =>
+      signInMutation({ variables: { email, password } }),
+    []
+  );
 
   return <LoginFormComponent onSubmit={onSubmit} />;
 };
