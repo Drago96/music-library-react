@@ -7,16 +7,20 @@ interface OwnProps {
   onSubmit: (values: { email: string; password: string }) => Promise<any>;
 }
 
-const Login: FunctionComponent<OwnProps> = memo(({ onSubmit }) => (
+const Register: FunctionComponent<OwnProps> = memo(({ onSubmit }) => (
   <Authentication
-    title="Login"
+    title="Register"
     components={{
       form: () => (
-        <AuthenticationForm onSubmit={onSubmit} button={{ text: 'Login' }} />
+        <AuthenticationForm
+          onSubmit={onSubmit}
+          button={{ text: 'Register' }}
+          includeFields={{ confirmPassword: true }}
+        />
       ),
       actions: () => <Fragment />
     }}
   />
 ));
 
-export default Login;
+export default Register;

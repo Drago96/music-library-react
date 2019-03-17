@@ -4,14 +4,20 @@ import { TextField } from 'formik-material-ui';
 import { Button, FormControl } from '@material-ui/core';
 import * as Yup from 'yup';
 
-import { useStyles } from './LoginForm.styles';
+import { useStyles } from './AuthenticationForm.styles';
 import { useErrorsHandler } from '../../../hooks/useErrorsHandler';
 
 interface OwnProps {
   onSubmit: (values: { email: string; password: string }) => Promise<any>;
+  button: {
+    text: string;
+  };
+  includeFields?: {
+    confirmPassword: boolean;
+  };
 }
 
-const loginSchema = Yup.object().shape({
+const authenticationSchema = Yup.object().shape({
   email: Yup.string()
     .required('email is required')
     .email('invalid email'),
@@ -21,22 +27,37 @@ const loginSchema = Yup.object().shape({
     .max(24)
 });
 
-const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
+const withConfirmPasswordSchema = authenticationSchema.shape({
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref('password')],
+    'passwords must match'
+  )
+});
+
+const AuthenticationForm: FunctionComponent<OwnProps> = ({
+  onSubmit,
+  button: { text: buttonText },
+  includeFields
+}) => {
   const classes = useStyles();
 
   const [errors, setErrors] = useErrorsHandler();
 
+  const validationSchema = includeFields!.confirmPassword
+    ? withConfirmPasswordSchema
+    : authenticationSchema;
+
   return (
     <Formik
-      initialValues={{ email: '', password: '' }}
-      onSubmit={(values, { setSubmitting }) => {
-        onSubmit(values).catch(e => {
+      initialValues={{ email: '', password: '', confirmPassword: '' }}
+      onSubmit={({ email, password }, { setSubmitting }) => {
+        onSubmit({ email, password }).catch(e => {
           setErrors(e);
 
           setSubmitting(false);
         });
       }}
-      validationSchema={loginSchema}
+      validationSchema={validationSchema}
       render={({ submitForm, isSubmitting }) => (
         <Form>
           {errors.length > 0 && (
@@ -64,6 +85,16 @@ const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
               component={TextField}
             />
           </FormControl>
+          {includeFields!.confirmPassword && (
+            <FormControl fullWidth={true} margin={'dense'}>
+              <Field
+                type="password"
+                label="Confirm Password"
+                name="confirmPassword"
+                component={TextField}
+              />
+            </FormControl>
+          )}
           <FormControl fullWidth={true} margin={'dense'}>
             <Button
               onClick={submitForm}
@@ -72,7 +103,7 @@ const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
               color={'primary'}
               disabled={isSubmitting}
             >
-              Login
+              {buttonText}
             </Button>
           </FormControl>
         </Form>
@@ -81,4 +112,10 @@ const LoginForm: FunctionComponent<OwnProps> = ({ onSubmit }) => {
   );
 };
 
-export default LoginForm;
+AuthenticationForm.defaultProps = {
+  includeFields: {
+    confirmPassword: false
+  }
+};
+
+export default AuthenticationForm;
