@@ -34,7 +34,7 @@ const Authentication: FunctionComponent<OwnProps> = ({
   const onSubmit = useCallback(
     ({ email, password }: { email: string; password: string }) =>
       authenticationMutation({ variables: { email, password } }),
-    []
+    [authenticationMutation]
   );
 
   const AuthenticationComponent = component;

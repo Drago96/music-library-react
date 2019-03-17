@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback } from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { SIGN_IN_MUTATION } from '../../../apollo/mutations/auth/sign-in';
 
