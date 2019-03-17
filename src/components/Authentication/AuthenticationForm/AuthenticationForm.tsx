@@ -50,12 +50,14 @@ const AuthenticationForm: FunctionComponent<OwnProps> = ({
   return (
     <Formik
       initialValues={{ email: '', password: '', confirmPassword: '' }}
-      onSubmit={({ email, password }, { setSubmitting }) => {
-        onSubmit({ email, password }).catch(e => {
+      onSubmit={async ({ email, password }, { setSubmitting }) => {
+        try {
+          await onSubmit({ email, password });
+        } catch (e) {
           setErrors(e);
 
           setSubmitting(false);
-        });
+        }
       }}
       validationSchema={validationSchema}
       render={({ submitForm, isSubmitting }) => (
