@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useReducer } from 'react';
 import {
   useMutation as useHookMutation,
   MutationFn,
@@ -18,7 +18,7 @@ type UseMutationHook = (
   } & MutationHookOptions<{}, OperationVariables, object>
 ) => [
   MutationFn<{}, OperationVariables>,
-  { loading: boolean; called: boolean; error: any }
+  { loading: boolean; called: boolean; error: any; data: any }
 ];
 
 export const useMutation: UseMutationHook = (
@@ -27,20 +27,47 @@ export const useMutation: UseMutationHook = (
 ) => {
   const mutate = useHookMutation(mutation, options);
 
-  const [loading, setLoading] = useState(false);
-  const [called, setCalled] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [mutationState, dispatch] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case 'start':
+          return {
+            loading: true,
+            called: true,
+            error: null
+          };
+        case 'success':
+          return {
+            ...state,
+            loading: false,
+            data: action.payload.data
+          };
+        case 'error':
+          return {
+            ...state,
+            loading: false,
+            error: action.payload.error
+          };
+        default:
+          return state;
+      }
+    },
+    {
+      loading: false,
+      called: false,
+      error: null,
+      data: null
+    }
+  );
 
   const handler: MutationFn<any, OperationVariables> = useCallback(
     async (...args) => {
-      setLoading(true);
-      setCalled(true);
-      setError(null);
+      dispatch({ type: 'start' });
 
       try {
         const { data } = await mutate(...args);
 
-        setLoading(false);
+        dispatch({ type: 'success', payload: { data } });
 
         if (onCompleted) {
           onCompleted(data);
@@ -48,8 +75,7 @@ export const useMutation: UseMutationHook = (
 
         return { data };
       } catch (error) {
-        setLoading(false);
-        setError(error);
+        dispatch({ type: 'error', payload: { error } });
 
         if (onError) {
           onError(error);
@@ -61,5 +87,5 @@ export const useMutation: UseMutationHook = (
     [mutate, onCompleted, onError]
   );
 
-  return [handler, { loading, error, called }];
+  return [handler, { ...mutationState }];
 };

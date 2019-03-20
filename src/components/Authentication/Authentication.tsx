@@ -23,7 +23,7 @@ const Authentication: FunctionComponent<OwnProps> = ({
     <Card raised={true} className={classes.root}>
       <CardHeader component={() => <PaperHeader title={title} />} />
       <CardContent>{form()}</CardContent>
-      <CardActions>{actions()}</CardActions>
+      <CardActions className={classes.actions}>{actions()}</CardActions>
     </Card>
   );
 };
